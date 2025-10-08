@@ -57,6 +57,26 @@ export default function HeroSection() {
                 }
             );
 
+            const tl = gsap.timeline({ defaults: { ease: "power1.inOut", duration: 1.5 } });
+
+            tl.fromTo(".slideShow h1:nth-child(1)", { x: -50, opacity: 0 }, { x: 0, opacity: 1 })
+                .fromTo(".slideShow h1:nth-child(2)", { x: -50, opacity: 0 }, { x: 0, opacity: 1 })
+                .fromTo(".slideShow h1:nth-child(3)", { x: -50, opacity: 0 }, { x: 0, opacity: 1 })
+                .fromTo(".slideShow p", { x: -50, opacity: 0 }, { x: 0, opacity: 1 }
+
+                );
+
+
+            gsap.to(".ImgRotation img", {
+                rotationY: (index) => (index % 2 === 0 ? 180 : 0),
+                duration: 2.5,
+                ease: "power2.inOut",
+                transformOrigin: "center center",
+            });
+
+
+
+
         }
 
     );
@@ -86,10 +106,27 @@ export default function HeroSection() {
             {/* Section 2 */}
             <div className="box2 flex justify-around items-center p-10 bg-gray-100 w-screen h-[800px]">
                 <div>
+
                     <h2 className="text-black text-6xl font-bold mb-4">Nature Transformation</h2>
                     <p className="text-gray-600 max-w-md">
                         Watch the image transform using GSAP’s clip-path animation.
                     </p>
+
+                    <div className="slideShow max-w-lg relative">
+                        <h1 className="text-3xl font-bold mb-4">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        </h1>
+                        <h1 className="text-purple-600 font-bold text-4xl">
+                            hi there everything is fine how are things going on bro
+                        </h1>
+                        <h1 className="text-green-600 font-bold text-3xl">
+                            everything will be ok don’t worry about it okk!
+                        </h1>
+                        <p className="text-gray-700">
+                            Ducimus rerum reprehenderit, autem, quibusdam qui repellendus et eius
+                            in fugit voluptates tenetur id obcaecati laboriosam expedita.
+                        </p>
+                    </div>
                 </div>
                 <div>
                     <img
@@ -102,16 +139,23 @@ export default function HeroSection() {
 
             {/* Section 3 */}
             <div className="box3 flex justify-around items-center p-10" ref={box3Ref}>
-                <div className="max-w-lg">
+                <div className="slideShow max-w-lg relative">
                     <h1 className="text-3xl font-bold mb-4">
                         Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    </h1>
+                    <h1 className="text-purple-600 font-bold text-4xl">
+                        hi there everything is fine how are things going on bro
+                    </h1>
+                    <h1 className="text-green-600 font-bold text-3xl">
+                        everything will be ok don’t worry about it okk!
                     </h1>
                     <p className="text-gray-700">
                         Ducimus rerum reprehenderit, autem, quibusdam qui repellendus et eius
                         in fugit voluptates tenetur id obcaecati laboriosam expedita.
                     </p>
                 </div>
-                <div className="flex gap-6">
+
+                <div className="flex gap-6 ImgRotation">
                     <img src={KarateGirl.src} className="w-[200px]" alt="Karate Girl" />
                     <img src={Astronaut.src} className="w-[200px]" alt="Astronaut" />
                 </div>

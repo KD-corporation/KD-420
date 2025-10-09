@@ -84,7 +84,7 @@ export default function HeroSection() {
     return (
         <div ref={containerRef} className="overflow-hidden">
             {/* Section 1 */}
-            <div className="firstBox bg-amber-50 w-screen text-center relative p-8">
+            <div className="firstBox bg-[#0B0F18]  w-screen text-center relative p-8">
                 <h1 className="z-10 text-6xl text-black antialiased font-bold mb-4">
                     Welcome to SQL Gaming World
                 </h1>

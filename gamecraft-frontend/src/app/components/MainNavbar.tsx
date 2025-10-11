@@ -1,9 +1,11 @@
 "use client";
-
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { MailMinus, HomeIcon, DollarSign, CropIcon, Menu, X } from "lucide-react";
 import SqlLogO from "@/app/assets/sql-triangle-letter-logo.webp";
+import LoginModal from "./LoginModal";
+import SignupModal from "./SignupModal";
 
 interface NavBarItems {
   name: string;
@@ -23,6 +25,9 @@ export default function MainNavbar() {
   const [scrollY, setScrollY] = useState(0);
   const [showFixedNav, setShowFixedNav] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,12 +99,14 @@ export default function MainNavbar() {
 
       {/* Right Side (Desktop) */}
       <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-        <button className="hover:text-gray-300 transition-all duration-200">
-          Login
-        </button>
-        <button className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-          Sign up
-        </button>
+        <div className="hidden md:flex items-center gap-4 text-sm font-medium">
+          <button onClick={() => setIsLoginOpen(true)} className="hover:text-gray-300 transition-all duration-200">
+            Login
+          </button>
+          <button onClick={() => setIsSignupOpen(true)} className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
+            Sign Up
+          </button>
+        </div>
       </div>
 
       {/* Hamburger (Mobile) */}
@@ -162,12 +169,13 @@ export default function MainNavbar() {
         </div>
 
         <div className="mt-auto px-6 py-6 border-t border-gray-700 flex flex-col gap-3">
-          <button className="hover:text-gray-300 transition-all duration-200">
+          <button onClick={() => setIsLoginOpen(true)} className="hover:text-gray-300 transition-all duration-200">
             Login
           </button>
-          <button className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-            Sign up
+          <button onClick={() => setIsSignupOpen(true)} className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
+            Sign Up
           </button>
+
         </div>
       </div>
 
@@ -178,6 +186,9 @@ export default function MainNavbar() {
           onClick={() => setIsDrawerOpen(false)}
         ></div>
       )}
+        {/* Modals */}
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+      <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </>
   );
 }

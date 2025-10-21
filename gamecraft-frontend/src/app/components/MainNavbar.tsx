@@ -6,6 +6,7 @@ import { MailMinus, HomeIcon, DollarSign, CropIcon, Menu, X } from "lucide-react
 import SqlLogO from "@/app/assets/sql-triangle-letter-logo.webp";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
+import LoginSignupSlider from "../auth/login/page";
 
 interface NavBarItems {
   name: string;
@@ -100,12 +101,9 @@ export default function MainNavbar() {
       {/* Right Side (Desktop) */}
       <div className="hidden md:flex items-center gap-4 text-sm font-medium">
         <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-          <button onClick={() => setIsLoginOpen(true)} className="hover:text-gray-300 transition-all duration-200">
-            Login
-          </button>
-          <button onClick={() => setIsSignupOpen(true)} className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-            Sign Up
-          </button>
+          <a href="/auth/login" className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
+            Login/SignUp
+          </a>
         </div>
       </div>
 

@@ -3,10 +3,27 @@
 
 import { useState } from "react";
 import { Github, InstagramIcon, Twitter } from "lucide-react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+interface userData {
+  name?: string;
+  email: string;
+  role?: string;
+  image?: string;
+  location?: string;
+}
+
+interface response {
+  success: boolean;
+  userData?: userData;
+  message?: string;
+}
 
 export default function LoginSignupSlider() {
   const [isSignUp, setIsSignUp] = useState(false);
-
+  const [isPasswordMtch, setPasswordMtch] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [loginFormData, setLoginFormData] = useState({
     email: "",
     password: "",
@@ -18,18 +35,73 @@ export default function LoginSignupSlider() {
     password: "",
     confirmPassword: "",
   });
+  const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const router = useRouter();
 
 
   //making signup call
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    if (signupFormData.password !== signupFormData.confirmPassword) {
+      setPasswordMtch(true);
+      return;
+    }
+    setPasswordMtch(false);
+
+    //api call can be made here
+    const response: response = await axios(`${BaseUrl}/api/auth/signup`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify({
+        name: signupFormData.name,
+        email: signupFormData.email,
+        password: signupFormData.password,
+      }),
+    })
+    if (!response.success) {
+      //handle error
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
+
     // Add your signup logic here
     console.log("Signup form data:", signupFormData);
+
+    //redirect to otp varification page
+    return router.push(`/auth/verify-email?email=${signupFormData.email}`);
+
   };
 
   //making login call
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+
+    //api call can be made here
+    const response: response = await axios(`${BaseUrl}/api/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify({
+        email: loginFormData.email,
+        password: loginFormData.password,
+      }),
+    })
+    if (!response.success) {
+      //handle error
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
+    //store the user data in local storage
+    localStorage.setItem('userData', response.userData ? JSON.stringify(response.userData) : "");
+
+    router.push('/dashboard');
     // Add your login logic here
     console.log("Login form data:", loginFormData);
   };
@@ -74,7 +146,7 @@ export default function LoginSignupSlider() {
               onChange={(e) =>
                 setSignupFormData({ ...signupFormData, name: e.target.value })
               }
-              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
             <input
               type="email"
@@ -84,7 +156,7 @@ export default function LoginSignupSlider() {
               onChange={(e) =>
                 setSignupFormData({ ...signupFormData, email: e.target.value })
               }
-              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
             <input
               type="password"
@@ -94,7 +166,7 @@ export default function LoginSignupSlider() {
               onChange={(e) =>
                 setSignupFormData({ ...signupFormData, password: e.target.value })
               }
-              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
             <input
               type="password"
@@ -104,11 +176,11 @@ export default function LoginSignupSlider() {
               onChange={(e) =>
                 setSignupFormData({ ...signupFormData, confirmPassword: e.target.value })
               }
-              className="w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400"
+              className={`w-full bg-gray-100 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-400` + (isPasswordMtch ? " border-2 border-red-600" : "")}
             />
 
             <button
-              type="submit"
+              onClick={handleSignup}
               className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold uppercase tracking-wider hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg"
             >
               Sign Up
@@ -171,8 +243,8 @@ export default function LoginSignupSlider() {
             </a>
 
             <button
-              onSubmit={handleLogin}
-              
+              onClick={handleLogin}
+
               className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold uppercase tracking-wider hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg"
             >
               Sign In

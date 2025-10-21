@@ -20,7 +20,9 @@ const OtpVerificationPage = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
+        console.log("URL Params:", params.toString());
         const userEmail = params.get('email');
+        // const userEmail = "kuldeep8410mtr@gmail.com";
         setEmail(userEmail);
     }, []);
 
@@ -39,7 +41,7 @@ const OtpVerificationPage = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${BaseUrl}/auth/verify-otp`, {
+            const response = await fetch(`${BaseUrl}/api/auth/verify-otp`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

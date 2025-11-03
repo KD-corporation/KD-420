@@ -29,6 +29,17 @@ export default function MainNavbar() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
+//CHECK USER IS  LOGIN OR NOT IF LOGGED IN SHOW LOGOUT BUT 
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect (() =>{
+      const token = localStorage.getItem("token");
+      if (token) {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn (false);
+      }
+    })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -75,14 +86,16 @@ export default function MainNavbar() {
   const NavbarContent = () => (
     <nav className="w-full flex flex-row items-center justify-between">
       {/* Logo */}
-      <div className="flex items-center space-x-2">
-        <img
-          src={SqlLogO.src}
-          className="w-10 h-10 sm:w-12 sm:h-12"
-          alt="logo"
-        />
-        <span className="text-xl font-bold tracking-wide">SQL Gaming</span>
-      </div>
+      <a href="/">
+        <div className="flex items-center space-x-2">
+          <img
+            src={SqlLogO.src}
+            className="w-10 h-10 sm:w-12 sm:h-12"
+            alt="logo"
+          />
+          <span className="text-xl font-bold tracking-wide">SQL Gaming</span>
+        </div>
+      </a>
 
       {/* Desktop Navbar Items */}
       <div className="hidden md:flex space-x-8 text-base font-medium">
@@ -102,7 +115,13 @@ export default function MainNavbar() {
       <div className="hidden md:flex items-center gap-4 text-sm font-medium">
         <div className="hidden md:flex items-center gap-4 text-sm font-medium">
           <a href="/auth/login" className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-            Login/SignUp
+            {isLoggedIn ? "" : "Login/SignUp"}
+            <button onClick={() => {
+              localStorage.removeItem("token");
+              setIsLoggedIn(false);
+            }}>
+              {isLoggedIn ? "Logout" : ""}
+            </button>
           </a>
         </div>
       </div>
@@ -138,9 +157,8 @@ export default function MainNavbar() {
 
       {/* Side Drawer (Mobile) */}
       <div
-        className={`fixed top-0 right-0 h-full w-64 bg-[#0B0F18] text-white transform ${
-          isDrawerOpen ? "translate-x-0" : "translate-x-full"
-        } transition-transform duration-500 ease-in-out z-[100] shadow-xl flex flex-col`}
+        className={`fixed top-0 right-0 h-full w-64 bg-[#0B0F18] text-white transform ${isDrawerOpen ? "translate-x-0" : "translate-x-full"
+          } transition-transform duration-500 ease-in-out z-[100] shadow-xl flex flex-col`}
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
           <span className="text-lg font-bold">SQL Gaming</span>
@@ -184,7 +202,7 @@ export default function MainNavbar() {
           onClick={() => setIsDrawerOpen(false)}
         ></div>
       )}
-        {/* Modals */}
+      {/* Modals */}
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
       <SignupModal isOpen={isSignupOpen} onClose={() => setIsSignupOpen(false)} />
     </>

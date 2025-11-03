@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Sparkles, Play, RotateCcw, Database, Award, ChevronRight, Trophy, Zap } from "lucide-react";
 
-export default function SQLGameUI2() {
+export default function SQLGameLevel02() {
   const [query, setQuery] = useState("");
   const [score, setScore] = useState(150);
   const [level, setLevel] = useState(2);

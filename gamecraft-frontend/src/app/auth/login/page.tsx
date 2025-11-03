@@ -12,11 +12,12 @@ interface userData {
   role?: string;
   image?: string;
   location?: string;
+  token? : string;
 }
 
 interface response {
-  success: boolean;
-  userData?: userData;
+  status: boolean;
+  user?: userData;
   message?: string;
 }
 
@@ -99,20 +100,27 @@ export default function LoginSignupSlider() {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify({
-        email: loginFormData.email,
+        Id: loginFormData.email,
         password: loginFormData.password,
       }),
     })
-    if (!response.success) {
+    if (!response.status) {
       //handle error
       setLoading(false);
       return;
     }
     setLoading(false);
     //store the user data in local storage
-    localStorage.setItem('userData', response.userData ? JSON.stringify(response.userData) : "");
+    const resPayload = (response as any).data;
+    if (resPayload?.status && resPayload?.data) {
+      localStorage.setItem("token", resPayload.data.token ?? "");
+      localStorage.setItem("userData", JSON.stringify(resPayload.data.user ?? {}));
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userData");
+    }
 
-    router.push('/dashboard');
+    router.push('/User-Profile');
     // Add your login logic here
     console.log("Login form data:", loginFormData);
   };

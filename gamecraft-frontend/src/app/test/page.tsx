@@ -48,13 +48,13 @@ const shuffleArray = <T,>(arr: T[]) => {
 
 // ---------------- Floating Bubble Component ----------------
 
-const FloatingBubble = ({ 
-    bubble, 
-    onClick, 
-    delay 
-}: { 
-    bubble: Bubble; 
-    onClick: () => void; 
+const FloatingBubble = ({
+    bubble,
+    onClick,
+    delay
+}: {
+    bubble: Bubble;
+    onClick: () => void;
     delay: number;
 }) => (
     <span
@@ -138,6 +138,8 @@ const SQLQueryGameTailwind = () => {
     const [loading, setLoading] = useState(false);
     const [score, setScore] = useState(0);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [userQueryResult, setUserQueryResult] = useState<any>(null);
+    const [correctQueryResult, setCorrectQueryResult] = useState<any>(null);
 
     // ---------------- 1. Fetch Question ----------------
 
@@ -220,6 +222,52 @@ const SQLQueryGameTailwind = () => {
     const checkAnswer = () => {
         const user = isManual ? manualQuery.trim().toLowerCase() : userQuery;
 
+        //payload Builder
+        const payload = {
+            question_id: (questionId) ? parseInt(questionId) : 0,
+            title: question?.Title,
+            user_query: user,
+        }
+
+        console.log("payload is", payload)
+
+        //run query api call
+        async function runUserQuery() {
+            try {
+                const response = await fetch('http://localhost:3001/api/run-query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await response.json();   // await correctly
+
+                // console.log('User query result:', data);
+
+                //  WRONG: if (response.status)
+                // response.status = HTTP CODE (200, 400...)
+                // 
+                // RIGHT: if (data.status)
+                if (data.status) {
+                    setUserQueryResult(data.user_result);
+                    setCorrectQueryResult(data.correct_result);
+
+                    // console.log('Correct query result:', data.correct_result);
+                } else {
+                    window.alert("There was an error with your query.");
+                    console.warn("Query incorrect:", data.message);
+                }
+
+                return data;
+
+            } catch (error) {
+                console.error('Error running user query:', error);
+                return null;
+            }
+        }
+
+        runUserQuery();
+
         if (!correctQuery) {
             setFeedback("❌ No correct answer found in backend.");
             return;
@@ -234,6 +282,8 @@ const SQLQueryGameTailwind = () => {
             setFeedback("❌ Incorrect. Try again!");
         }
     };
+
+
 
     // ---------------- UI ----------------
 
@@ -373,7 +423,7 @@ const SQLQueryGameTailwind = () => {
                     </div>
 
                     {/* Query Builder */}
-                    <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8">
+                    <div className="bg-white text-black rounded-2xl shadow-2xl p-4 sm:p-8">
                         <h3 className="text-lg sm:text-2xl font-bold text-yellow-600 mb-4 flex items-center gap-2">
                             <span className="text-2xl sm:text-3xl">🎯</span> Build Your SQL Query
                         </h3>
@@ -443,14 +493,34 @@ const SQLQueryGameTailwind = () => {
 
                         {/* Feedback */}
                         {feedback && (
-                            <div className={`mt-6 p-4 sm:p-6 rounded-xl font-bold text-base sm:text-lg text-center ${
-                                feedback.includes("Correct") 
-                                    ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-pulse" 
-                                    : "bg-gradient-to-r from-red-400 to-pink-500 text-white"
-                            }`}>
+                            <div className={`mt-6 p-4 sm:p-6 rounded-xl font-bold text-base sm:text-lg text-center ${feedback.includes("Correct")
+                                ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white animate-pulse"
+                                : "bg-gradient-to-r from-red-400 to-pink-500 text-white"
+                                }`}>
                                 {feedback}
                             </div>
                         )}
+
+                        <div>
+                            {(correctQueryResult || userQueryResult) ? (
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <div>
+                                        <TablePreview
+                                            tableName="Correct Answer"
+                                            rows={correctQueryResult || []}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <TablePreview
+                                            tableName="Your Answer"
+                                            rows={userQueryResult || []}
+                                        />
+                                    </div>
+                                </div>
+
+                            ) : ("")}
+                        </div>
                     </div>
                 </div>
             </div>

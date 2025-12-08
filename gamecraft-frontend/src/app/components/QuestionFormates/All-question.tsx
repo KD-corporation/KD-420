@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { ChevronDown, ChevronUp, Database, Zap, Trophy, Target } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Database,
+  Zap,
+  Trophy,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface Question {
@@ -17,7 +23,7 @@ interface ApiResponse {
   data: Question[];
 }
 
-export default function SqlQuestions() {
+export default function SqlQuestions({ search = "", level = "" }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [openId, setOpenId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,6 +31,9 @@ export default function SqlQuestions() {
 
   const router = useRouter();
 
+  // ---------------------------
+  // Fetch ALL questions once
+  // ---------------------------
   useEffect(() => {
     async function fetchQuestions() {
       try {
@@ -46,6 +55,35 @@ export default function SqlQuestions() {
     fetchQuestions();
   }, []);
 
+  // ---------------------------
+  // Fetch FILTERED questions on search/level change
+  // ---------------------------
+  useEffect(() => {
+    async function fetchFiltered() {
+      try {
+        const res = await fetch(
+          `http://localhost:3001/getapis/get-questions-by-filters?search=${encodeURIComponent(
+            search
+          )}&level=${encodeURIComponent(level)}`
+        );
+
+        const json: ApiResponse = await res.json();
+
+        if (json.status && Array.isArray(json.data)) {
+          setQuestions(json.data);
+        } else {
+          setError("Failed to fetch filtered questions");
+        }
+      } catch (err) {
+        setError("Network error while applying filters");
+      }
+    }
+
+    if (search !== "" || level !== "") {
+      fetchFiltered();
+    }
+  }, [search, level]);
+
   const toggle = (id: number) => {
     setOpenId((prev) => (prev === id ? null : id));
   };
@@ -57,8 +95,10 @@ export default function SqlQuestions() {
         {/* HEADER */}
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur-xl opacity-30"></div>
+
           <div className="relative bg-slate-800/80 backdrop-blur-sm border border-cyan-500/30 rounded-2xl p-6 shadow-2xl">
             <div className="flex items-center justify-between">
+              
               <div className="flex items-center gap-4">
                 <div className="bg-gradient-to-br from-cyan-400 to-purple-500 p-3 rounded-xl shadow-lg shadow-cyan-500/50">
                   <Database className="w-8 h-8 text-white" />
@@ -67,14 +107,18 @@ export default function SqlQuestions() {
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                     SQL Practice Arena
                   </h1>
-                  <p className="text-slate-400 text-sm mt-1">Master your database skills</p>
+                  <p className="text-slate-400 text-sm mt-1">
+                    Master your database skills
+                  </p>
                 </div>
               </div>
+
               <div className="flex items-center gap-2 bg-slate-900/50 px-4 py-2 rounded-lg border border-purple-500/30">
                 <Trophy className="w-5 h-5 text-yellow-400" />
                 <span className="text-yellow-400 font-bold">{questions.length}</span>
                 <span className="text-slate-400 text-sm">Challenges</span>
               </div>
+
             </div>
           </div>
         </div>
@@ -101,7 +145,7 @@ export default function SqlQuestions() {
           {questions.map((q, index) => (
             <div key={q.Id} className="group relative">
 
-              {/* Hover Glow */}
+              {/* Glow */}
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
               {/* Card */}
@@ -109,7 +153,6 @@ export default function SqlQuestions() {
 
                 <div className="h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
 
-                {/* Header */}
                 <button
                   onClick={() => toggle(q.Id)}
                   className="w-full p-5 text-left flex justify-between items-center"
@@ -141,11 +184,13 @@ export default function SqlQuestions() {
                     </div>
 
                     <button
-                      onClick={() => {
+                      onClick={() =>
                         router.push(
-                          `/test?id=${q.Id}&title=${encodeURIComponent(q.Title)}&Des=${encodeURIComponent(q.Description)}`
-                        );
-                      }}
+                          `/test?id=${q.Id}&title=${encodeURIComponent(
+                            q.Title
+                          )}&Des=${encodeURIComponent(q.Description)}`
+                        )
+                      }
                       className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg text-white font-semibold shadow-lg hover:scale-105 transition-all"
                     >
                       <span className="flex items-center gap-2">
@@ -155,12 +200,13 @@ export default function SqlQuestions() {
                     </button>
                   </div>
                 )}
+
               </div>
             </div>
           ))}
         </div>
 
-        {/* Empty State */}
+        {/* EMPTY */}
         {!loading && questions.length === 0 && !error && (
           <div className="text-center py-12">
             <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8 max-w-md mx-auto">

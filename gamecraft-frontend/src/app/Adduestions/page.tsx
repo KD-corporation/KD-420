@@ -3,6 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { Database, Plus, Zap, Trophy, Target, Sparkles, Play, ChevronRight, Swords, Shield } from "lucide-react";
 
+import TablesPreviewResponse from "./PreviewOfTables";
+
 /* ---------------------- INTERFACES ---------------------- */
 
 interface TableFormat {
@@ -14,14 +16,14 @@ interface TableFormat {
 }
 
 interface QuestionFormat {
-  id: string;
-  QuestionDes: string;
-  Options?: string[];
-  Answer?: string;
-  Category?: string[];
-  Difficulty: string;
-  Points: number;
-  usedTables?: string[];
+  contributed_by: string;
+  title: string;
+  description: string;
+  topics: string[];
+  answer: string;
+  difficulty_level: string;
+  rewards: number;
+  used_tables: string[];
 }
 
 interface SelectedTableFormat {
@@ -49,15 +51,17 @@ export default function AddQuestionPage() {
   });
 
   const [questionData, setQuestionData] = useState<QuestionFormat>({
-    id: "",
-    QuestionDes: "",
-    Options: [],
-    Answer: "",
-    Category: [],
-    Difficulty: "",
-    Points: 0,
-    usedTables: [],
+    contributed_by: "",
+    title: "",
+    description: "",
+    topics: [],
+    answer: "",
+    difficulty_level: "",
+    rewards: 0,
+    used_tables: [],
   });
+
+
 
   const [tableInputData, setTableInputData] = useState<TableFormat>({
     TableName: "",
@@ -83,9 +87,21 @@ export default function AddQuestionPage() {
 
   /* ---------------------- HANDLERS ---------------------- */
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("userData");
+    if (storedUser) {
+      const parsed = JSON.parse(storedUser);
+      setQuestionData((prev) => ({
+        ...prev,
+        contributed_by: parsed.email || "",
+      }));
+    }
+  }, []);
+
+
   const handleAddQuestion = async () => {
     try {
-      const res = await fetch("/api/addQuestion", {
+      const res = await fetch("http://localhost:3001/api/contribute-question", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(questionData),
@@ -93,11 +109,13 @@ export default function AddQuestionPage() {
 
       const saved = await res.json();
       console.log("Saved question →", saved);
+
       alert("Question added!");
     } catch (err) {
       console.error("Failed to save question", err);
     }
   };
+
 
   const handleCreateTable = async () => {
     try {
@@ -241,6 +259,8 @@ export default function AddQuestionPage() {
           </div>
         </section>
 
+        <TablesPreviewResponse />
+
         {/* ---------------- AVAILABLE TABLES ---------------- */}
         <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-950/80 to-slate-900/80 backdrop-blur-sm border border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
           <div className="absolute inset-0 bg-grid-white/[0.02] pointer-events-none"></div>
@@ -328,10 +348,10 @@ export default function AddQuestionPage() {
 
             <div className="space-y-4">
               <input
-                placeholder="🎯 Question ID"
+                placeholder="🎯 Question Title"
                 className="w-full px-4 py-3 bg-slate-800/50 border border-pink-500/30 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
                 onChange={(e) =>
-                  setQuestionData({ ...questionData, id: e.target.value })
+                  setQuestionData({ ...questionData, title: e.target.value })
                 }
               />
 
@@ -342,23 +362,51 @@ export default function AddQuestionPage() {
                 onChange={(e) =>
                   setQuestionData({
                     ...questionData,
-                    QuestionDes: e.target.value,
+                    description: e.target.value,
                   })
                 }
               />
 
               <input
-                placeholder="✅ Answer"
+                placeholder="🏷️ Topics (comma separated)"
                 className="w-full px-4 py-3 bg-slate-800/50 border border-pink-500/30 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
                 onChange={(e) =>
-                  setQuestionData({ ...questionData, Answer: e.target.value })
+                  setQuestionData({
+                    ...questionData,
+                    topics: e.target.value
+                      .split(",")
+                      .map((x) => x.trim())
+                      .filter((x) => x !== ""),
+                  })
+                }
+              />
+
+              {questionData.topics?.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {questionData.topics.map((t, index) => (
+                    <span
+                      key={index}
+                      className="bg-pink-500/20 border border-pink-400/30 text-pink-200 px-3 py-1 rounded-full text-sm"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+
+              <input
+                placeholder="Answer"
+                className="w-full px-4 py-3 bg-slate-800/50 border border-pink-500/30 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
+                onChange={(e) =>
+                  setQuestionData({ ...questionData, answer: e.target.value })
                 }
               />
 
               <select
                 className="w-full px-4 py-3 bg-slate-800/50 border border-pink-500/30 rounded-xl text-white focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
                 onChange={(e) =>
-                  setQuestionData({ ...questionData, Difficulty: e.target.value })
+                  setQuestionData({ ...questionData, difficulty_level: e.target.value })
                 }
               >
                 <option value="">⚔️ Select Difficulty</option>
@@ -372,7 +420,7 @@ export default function AddQuestionPage() {
                 type="number"
                 className="w-full px-4 py-3 bg-slate-800/50 border border-pink-500/30 rounded-xl text-white placeholder-pink-300/50 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20 transition-all"
                 onChange={(e) =>
-                  setQuestionData({ ...questionData, Points: Number(e.target.value) })
+                  setQuestionData({ ...questionData, rewards: Number(e.target.value) })
                 }
               />
 
@@ -383,7 +431,7 @@ export default function AddQuestionPage() {
                   onChange={(e) =>
                     setQuestionData({
                       ...questionData,
-                      usedTables: e.target.value
+                      used_tables: e.target.value
                         .split(",")
                         .map((x) => x.trim())
                         .filter((x) => x !== ""),
@@ -391,14 +439,14 @@ export default function AddQuestionPage() {
                   }
                 />
 
-                {questionData.usedTables && questionData.usedTables.length > 0 && (
+                {questionData.used_tables && questionData.used_tables.length > 0 && (
                   <div className="mt-4">
                     <div className="text-sm text-pink-300/70 mb-2 flex items-center gap-2">
                       <Target className="w-4 h-4" />
                       Linked columns:
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {questionData.usedTables.map((col, index) => (
+                      {questionData.used_tables.map((col, index) => (
                         <span
                           key={index}
                           className="bg-gradient-to-r from-pink-500/20 to-purple-500/20 border border-pink-400/30 text-pink-200 px-4 py-2 rounded-full text-sm font-medium shadow-lg shadow-pink-500/10"

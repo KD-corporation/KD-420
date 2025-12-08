@@ -8,6 +8,7 @@ export default function SQLGameLevel01() {
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
 
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-6 flex justify-center items-center">
       <div className="w-full max-w-4xl space-y-6">

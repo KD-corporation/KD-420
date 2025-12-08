@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { MailMinus, HomeIcon, DollarSign, CropIcon, Menu, X } from "lucide-react";
+import { MailMinus, HomeIcon, DollarSign, CropIcon, Menu, X, User2 } from "lucide-react";
 import SqlLogO from "@/app/assets/sql-triangle-letter-logo.webp";
 import LoginModal from "./LoginModal";
 import SignupModal from "./SignupModal";
@@ -123,6 +123,7 @@ export default function MainNavbar() {
               {isLoggedIn ? "Logout" : ""}
             </button>
           </a>
+          <a href="/User-Profile" className="bg-black text-black px-3 py-1.5 hover:bg-gray-200 transition-all duration-200 border-amber-50 rounded-4xl right-2"> <User2 color="white" size={25} /></a>
         </div>
       </div>
 

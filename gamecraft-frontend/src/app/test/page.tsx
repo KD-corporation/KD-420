@@ -35,8 +35,8 @@ interface Bubble {
     key: string;
 }
 
-// ---------------- Helpers ----------------
 
+// ---------------- Helpers ----------------
 const shuffleArray = <T,>(arr: T[]) => {
     const array = [...arr];
     for (let i = array.length - 1; i > 0; i--) {
@@ -46,8 +46,10 @@ const shuffleArray = <T,>(arr: T[]) => {
     return array;
 };
 
-// ---------------- Floating Bubble Component ----------------
 
+
+
+// ---------------- Floating Bubble Component ----------------
 const FloatingBubble = ({
     bubble,
     onClick,
@@ -68,8 +70,11 @@ const FloatingBubble = ({
     </span>
 );
 
-// ---------------- Table Preview ----------------
 
+
+
+
+// ---------------- Table Preview ----------------
 const TablePreview = ({
     tableName,
     rows,
@@ -121,9 +126,11 @@ const TablePreview = ({
         )}
     </div>
 );
+// <----------- Table Preview Component End ----------->
+
+
 
 // ---------------- Main Component ----------------
-
 const SQLQueryGameTailwind = () => {
     const searchParams = useSearchParams();
     const questionId = searchParams.get("id");
@@ -141,8 +148,10 @@ const SQLQueryGameTailwind = () => {
     const [userQueryResult, setUserQueryResult] = useState<any>(null);
     const [correctQueryResult, setCorrectQueryResult] = useState<any>(null);
 
-    // ---------------- 1. Fetch Question ----------------
+    const [email, setEmail] = useState<string>("");
+    const [currentPoints, setCurrentPoints] = useState<number>(0);
 
+    // ---------------- 1. Fetch Question ----------------
     useEffect(() => {
         if (!questionId) return;
 
@@ -164,8 +173,10 @@ const SQLQueryGameTailwind = () => {
         fetchQuestion();
     }, [questionId]);
 
-    // ---------------- 2. Generate Bubbles After Question Loads ----------------
 
+
+
+    // ---------------- 2. Generate Bubbles After Question Loads ----------------
     useEffect(() => {
         if (!question?.Answer) return;
 
@@ -180,8 +191,9 @@ const SQLQueryGameTailwind = () => {
         setAvailableBubbles(shuffleArray(bubbles));
     }, [question]);
 
-    // ---------------- 3. Fetch Table Preview ----------------
 
+
+    // ---------------- 3. Fetch Table Preview ----------------
     useEffect(() => {
         if (!question?.UsedTables) return;
 
@@ -197,8 +209,9 @@ const SQLQueryGameTailwind = () => {
         fetchPreview();
     }, [question]);
 
-    // ---------------- Computed Queries ----------------
 
+
+    // ---------------- Computed Queries ----------------
     const correctQuery = useMemo(() => {
         return question?.Answer?.trim().toLowerCase() || "";
     }, [question]);
@@ -207,8 +220,9 @@ const SQLQueryGameTailwind = () => {
         return selectedQuery.map((b) => b.word).join(" ").toLowerCase().trim();
     }, [selectedQuery]);
 
-    // ---------------- Handlers ----------------
 
+
+    // ---------------- Handlers ----------------
     const selectBubble = (b: Bubble) => {
         setSelectedQuery((prev) => [...prev, b]);
         setAvailableBubbles((prev) => prev.filter((x) => x.id !== b.id));
@@ -219,9 +233,28 @@ const SQLQueryGameTailwind = () => {
         setAvailableBubbles((prev) => shuffleArray([...prev, b]));
     };
 
+
+
+
+    // ---------------- Check Answer ----------------
+    // This function checks the user's query against the correct answer
+    // and updates the score, feedback, and user query results accordingly.
+    // It also updates the question's solved status in the backend.
+    // It handles both manual queries and bubble-based queries.
     const checkAnswer = () => {
         const user = isManual ? manualQuery.trim().toLowerCase() : userQuery;
+        const userLocalEmail = localStorage.getItem("userData");
+        try {
+            setEmail(JSON.parse(userLocalEmail || "{}").email || "");
+        } catch (e) {
+            console.warn("Failed to parse userData from localStorage:", e);
+            setEmail("");
+        }
 
+        if (!user) {
+            setFeedback("Please build or write a query first.");
+            return;
+        }
         //payload Builder
         const payload = {
             question_id: (questionId) ? parseInt(questionId) : 0,
@@ -252,6 +285,24 @@ const SQLQueryGameTailwind = () => {
                     setUserQueryResult(data.user_result);
                     setCorrectQueryResult(data.correct_result);
 
+
+//<------------ make api call to update that question is solved  ----------- >
+                    const updateResponse = await fetch(`http://localhost:3001/api/update-question-solved-status?user_id=${email}&question_id=${questionId}&solved=true`, {
+                        method: 'GEt',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    const updateData = await updateResponse.json();
+                    if (updateData.status) {
+                        setCurrentPoints(updateData.points_earned);
+                        window.alert("you did and current point is " + updateData.points_earned);
+                        // console.log("Question solved successfully", updateData);
+                    } else {
+                        console.error("Failed to update question status:", updateData.message);
+                    }
+// <------------ make api call to update that question is solved END  ----------- >
+
+
                     // console.log('Correct query result:', data.correct_result);
                 } else {
                     window.alert("There was an error with your query.");
@@ -269,17 +320,17 @@ const SQLQueryGameTailwind = () => {
         runUserQuery();
 
         if (!correctQuery) {
-            setFeedback("❌ No correct answer found in backend.");
+            setFeedback(" No correct answer found in backend.");
             return;
         }
 
         if (user === correctQuery) {
-            setFeedback("✅ Correct! Well done.");
+            setFeedback("Correct! Well done.");
             setScore(prev => prev + (question?.Points || 10));
             setShowConfetti(true);
             setTimeout(() => setShowConfetti(false), 3000);
         } else {
-            setFeedback("❌ Incorrect. Try again!");
+            setFeedback("Incorrect. Try again!");
         }
     };
 
@@ -381,7 +432,7 @@ const SQLQueryGameTailwind = () => {
                                 <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
                                 <div>
                                     <p className="text-xs sm:text-sm text-gray-600">Your Score</p>
-                                    <p className="text-2xl sm:text-3xl font-bold text-indigo-600">{score}</p>
+                                    <p className="text-2xl sm:text-3xl font-bold text-indigo-600">{currentPoints}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-indigo-500 px-4 sm:px-6 py-2 sm:py-3 rounded-xl">

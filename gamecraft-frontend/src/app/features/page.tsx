@@ -30,6 +30,7 @@ export const Features = () => {
         totalHard: 0,
         solved: 0,
         total: 0,
+        points_earned : 0,
     });
 
     useEffect(() => {
@@ -54,6 +55,7 @@ export const Features = () => {
                         totalHard: data.total_available_hard || 0,
                         solved: data.total_easy_solved + data.total_medium_solved + data.total_hard_solved || 0,
                         total: data.total_available_easy + data.total_available_medium + data.total_available_hard || 0,
+                        points_earned: data.points_earned || 0,
                     });
                 } else {
                     console.error("Failed to fetch user stats");
@@ -127,7 +129,7 @@ export const Features = () => {
                             </div>
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
                                 <Trophy className="w-4 h-4 text-purple-500" />
-                                {/* <span className="text-sm font-bold text-gray-700">{stats.rating}</span> */}
+                                <span className="text-sm font-bold text-gray-700">{stats.points_earned}</span>
                             </div>
                         </div>
                     </div>

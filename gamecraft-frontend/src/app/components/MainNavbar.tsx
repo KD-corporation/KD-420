@@ -18,7 +18,7 @@ const navObject: NavBarItems[] = [
   { name: "Main", icon: MailMinus, url: "/Game/module1" },
   { name: "Features", icon: HomeIcon, url: "/features" },
   { name: "Pricing", icon: DollarSign, url: "#pricing" },
-  { name: "About Us", icon: CropIcon, url: "#about" },
+  { name: "About Us", icon: CropIcon, url: "/about" },
 ];
 
 export default function MainNavbar() {

@@ -115,7 +115,7 @@ export const Features = () => {
                                 <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                 Bubble Select
                             </a>
-                            <a href="/Game/Arrange-queries" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium transition-colors group">
+                            <a href="/Game/arrangeGame" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium transition-colors group">
                                 <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                                 Arrange Query
                             </a>

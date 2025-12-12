@@ -12,10 +12,10 @@ interface QuesObject {
 }
 
 interface responseObject {
-    Data? : String,
-    Status : Boolean,
-    message : String,
-    Result : Boolean
+    Data?: String,
+    Status: Boolean,
+    message: String,
+    Result: Boolean
 }
 
 
@@ -58,11 +58,21 @@ export default function SQLGameLevel01() {
 
     async function submitAnswer() {
         try {
-            const token = localStorage.getItem("token"); // or cookies
             setLoading(true);
+            const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+            const auth_token = localStorage.getItem("auth_token") || "";
+            console.log("Submitting query:", query, "tokend", auth_token);
+
+
+            //apply filters to query here if there is Drop, Delete, and Turncate statements
+            if (query.toLowerCase().includes("drop") || query.toLowerCase().includes("delete") || query.toLowerCase().includes("truncate")) {
+                alert("Malicious queries are not allowed!");
+                setLoading(false);
+                return;
+            }
 
             const response = await axios.post(
-                `http://localhost:3001/api/run?id=${question.id}`,
+                `${BaseUrl}/api/run?id=${question.id}`,
                 {
                     // body sent to backend
                     AnswerQuery: query,
@@ -70,17 +80,17 @@ export default function SQLGameLevel01() {
                 {
                     withCredentials: true,
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${auth_token}`,
                         "Content-Type": "application/json",
                     },
                 }
             );
-            if(response.data.Result){
+            if (response.data.Result) {
                 setScore(score + 10);
                 setLevel(level + 1);
             }
-            if(!(response.data.Status)){
-                alert( response.data.message);
+            if (!(response.data.Status)) {
+                alert(response.data.message);
             }
             console.log("Answer Response:", response);
             setRes(response.data);
@@ -89,7 +99,7 @@ export default function SQLGameLevel01() {
         } catch (err: any) {
             setLoading(false);
             alert("Error " + err.response.data.message || "Unable to submit answer.");
-             setRes(err.response.data);
+            setRes(err.response.data);
             console.error("Error submitting answer:", err);
         }
     }
@@ -197,7 +207,7 @@ export default function SQLGameLevel01() {
                                 onClick={submitAnswer}
                                 className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 transform hover:scale-105">
                                 <Play className="w-5 h-5" />
-                               {loading ? "Casting..." : "Cast Spell"}
+                                {loading ? "Casting..." : "Cast Spell"}
                             </button>
                             <button
                                 onClick={() => {

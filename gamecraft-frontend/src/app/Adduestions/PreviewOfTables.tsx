@@ -14,9 +14,11 @@ export default function TablesPreview() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+
     async function fetchPreview() {
       try {
-        const res = await fetch("http://localhost:3001/getapis/get-all-tables-preview");
+        const res = await fetch(`${BaseUrl}/getapis/get-all-tables-preview`);
         const json: TablesPreviewResponse = await res.json();
 
         if (json.status) {

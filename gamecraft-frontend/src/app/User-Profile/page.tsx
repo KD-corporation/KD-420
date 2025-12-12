@@ -52,9 +52,10 @@ export default function UserProfilePage() {
 
     // Fetch from backend
     const fetchUser = async () => {
+      const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
       try {
         const response = await fetch(
-          `http://localhost:3001/getapis/get-user-profile?email=${email}`
+          `${BaseUrl}/getapis/get-user-profile?email=${email}`
         );
 
         if (!response.ok) {

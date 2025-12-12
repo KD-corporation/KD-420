@@ -154,12 +154,14 @@ const SQLQueryGameTailwind = () => {
     // ---------------- 1. Fetch Question ----------------
     useEffect(() => {
         if (!questionId) return;
+        const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 
         const fetchQuestion = async () => {
             try {
                 setLoading(true);
                 const res = await fetch(
-                    `http://localhost:3001/getapis/get-question?id=${questionId}`
+                    `${BaseUrl}/getapis/get-question?id=${questionId}`
                 );
                 const json: QuestionResponse = await res.json();
                 setQuestion(json.data);
@@ -196,11 +198,13 @@ const SQLQueryGameTailwind = () => {
     // ---------------- 3. Fetch Table Preview ----------------
     useEffect(() => {
         if (!question?.UsedTables) return;
+        const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+
 
         const fetchPreview = async () => {
             const tables = question.UsedTables.join(",");
             const res = await fetch(
-                `http://localhost:3001/getapis/get-tables-preview?tables=${tables}`
+                `${BaseUrl}/getapis/get-tables-preview?tables=${tables}`
             );
             const json: TablePreviewResponse = await res.json();
             if (json.status) setTablePreview(json.data);
@@ -244,6 +248,7 @@ const SQLQueryGameTailwind = () => {
     const checkAnswer = () => {
         const user = isManual ? manualQuery.trim().toLowerCase() : userQuery;
         const userLocalEmail = localStorage.getItem("userData");
+        const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
         try {
             setEmail(JSON.parse(userLocalEmail || "{}").email || "");
         } catch (e) {
@@ -267,9 +272,17 @@ const SQLQueryGameTailwind = () => {
         //run query api call
         async function runUserQuery() {
             try {
-                const response = await fetch('http://localhost:3001/api/run-query', {
+                const auth_token = localStorage.getItem("token") || "";
+                console.log("Submitting query:", payload, "tokend", auth_token);
+
+                const response = await fetch(`${BaseUrl}/api/run-query`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    headers: {
+                        Authorization: `Bearer ${auth_token}`,
+                        "Content-Type": "application/json",
+                    },
+
                     body: JSON.stringify(payload),
                 });
 
@@ -286,8 +299,8 @@ const SQLQueryGameTailwind = () => {
                     setCorrectQueryResult(data.correct_result);
 
 
-//<------------ make api call to update that question is solved  ----------- >
-                    const updateResponse = await fetch(`http://localhost:3001/api/update-question-solved-status?user_id=${email}&question_id=${questionId}&solved=true`, {
+                    //<------------ make api call to update that question is solved  ----------- >
+                    const updateResponse = await fetch(`${BaseUrl}/api/update-question-solved-status?user_id=${email}&question_id=${questionId}&solved=true`, {
                         method: 'GEt',
                         headers: { 'Content-Type': 'application/json' },
                     });
@@ -300,7 +313,7 @@ const SQLQueryGameTailwind = () => {
                     } else {
                         console.error("Failed to update question status:", updateData.message);
                     }
-// <------------ make api call to update that question is solved END  ----------- >
+                    // <------------ make api call to update that question is solved END  ----------- >
 
 
                     // console.log('Correct query result:', data.correct_result);

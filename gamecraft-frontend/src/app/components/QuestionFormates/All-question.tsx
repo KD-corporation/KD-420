@@ -11,9 +11,10 @@ import {
 import { useRouter } from "next/navigation";
 
 interface Question {
-  Id: number;
-  Title: string;
-  Description: string;
+  id: number;
+  title: string;
+  description: string;
+  answer : string;
 }
 
 interface ApiResponse {
@@ -35,13 +36,16 @@ export default function SqlQuestions({ search = "", level = "" }) {
   // Fetch ALL questions once
   // ---------------------------
   useEffect(() => {
+    const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
     async function fetchQuestions() {
       try {
-        const res = await fetch("http://localhost:3001/getapis/get-question-all");
+        const res = await fetch(`${BaseUrl}/getapis/get-question-all`);
         const json: ApiResponse = await res.json();
+        // console.log("data", json)
 
         if (json.status && Array.isArray(json.data)) {
           setQuestions(json.data);
+          // console.log("questions", questions)
         } else {
           setError("Failed to fetch questions");
         }
@@ -60,17 +64,20 @@ export default function SqlQuestions({ search = "", level = "" }) {
   // ---------------------------
   useEffect(() => {
     async function fetchFiltered() {
+      const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
       try {
         const res = await fetch(
-          `http://localhost:3001/getapis/get-questions-by-filters?search=${encodeURIComponent(
+          `${BaseUrl}/getapis/get-questions-by-filters?search=${encodeURIComponent(
             search
           )}&level=${encodeURIComponent(level)}`
         );
 
         const json: ApiResponse = await res.json();
+        console.log("Filtered data", json);
 
         if (json.status && Array.isArray(json.data)) {
           setQuestions(json.data);
+          console.log("Filtered questions", questions);
         } else {
           setError("Failed to fetch filtered questions");
         }
@@ -143,7 +150,7 @@ export default function SqlQuestions({ search = "", level = "" }) {
         {/* Question List */}
         <div className="grid gap-4">
           {questions.map((q, index) => (
-            <div key={q.Id} className="group relative">
+            <div key={q.id} className="group relative">
 
               {/* Glow */}
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -154,7 +161,7 @@ export default function SqlQuestions({ search = "", level = "" }) {
                 <div className="h-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"></div>
 
                 <button
-                  onClick={() => toggle(q.Id)}
+                  onClick={() => toggle(q.id)}
                   className="w-full p-5 text-left flex justify-between items-center"
                 >
                   <div className="flex items-center gap-4">
@@ -163,12 +170,12 @@ export default function SqlQuestions({ search = "", level = "" }) {
                     </div>
 
                     <h2 className="text-lg font-bold text-white group-hover:text-cyan-400 transition-colors">
-                      {q.Title}
+                      {q.title}
                     </h2>
                   </div>
 
                   <div className="bg-slate-900/50 p-2 rounded-lg border border-slate-700">
-                    {openId === q.Id ? (
+                    {openId === q.id ? (
                       <ChevronUp className="w-5 h-5 text-cyan-400" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-slate-400" />
@@ -177,18 +184,18 @@ export default function SqlQuestions({ search = "", level = "" }) {
                 </button>
 
                 {/* Expanded Content */}
-                {openId === q.Id && (
+                {openId === q.id && (
                   <div className="px-5 pb-5 animate-in slide-in-from-top-2 duration-300">
                     <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700/50 mb-4">
-                      <p className="text-slate-300 leading-relaxed">{q.Description}</p>
+                      <p className="text-slate-300 leading-relaxed">{q.description}</p>
                     </div>
 
                     <button
                       onClick={() =>
                         router.push(
-                          `/test?id=${q.Id}&title=${encodeURIComponent(
-                            q.Title
-                          )}&Des=${encodeURIComponent(q.Description)}`
+                          `/test?id=${q.id}&title=${encodeURIComponent(
+                            q.title
+                          )}&Des=${encodeURIComponent(q.description)}`
                         )
                       }
                       className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg text-white font-semibold shadow-lg hover:scale-105 transition-all"
@@ -196,6 +203,22 @@ export default function SqlQuestions({ search = "", level = "" }) {
                       <span className="flex items-center gap-2">
                         <Zap className="w-4 h-4" />
                         Start Challenge
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/Game/arrangeGame?id=${q.id}&text=${encodeURIComponent(
+                            q.description
+                          )}&ans=${encodeURIComponent(q.answer)}`
+                        )
+                      }
+                      className="px-6 py-3 m-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg text-white font-semibold shadow-lg hover:scale-105 transition-all"
+                    >
+                      <span className="flex items-center gap-2">
+                        <Zap className="w-4 h-4" />
+                         Arrange Game
                       </span>
                     </button>
                   </div>

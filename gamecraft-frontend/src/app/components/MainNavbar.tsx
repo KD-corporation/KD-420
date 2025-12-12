@@ -15,9 +15,9 @@ interface NavBarItems {
 }
 
 const navObject: NavBarItems[] = [
-  { name: "Main", icon: MailMinus, url: "/Game/module1" },
+  { name: "Main", icon: MailMinus, url: "/" },
   { name: "Features", icon: HomeIcon, url: "/features" },
-  { name: "Pricing", icon: DollarSign, url: "#pricing" },
+  { name: "Add Qeustions", icon: DollarSign, url: "/Adduestions" },
   { name: "About Us", icon: CropIcon, url: "/about" },
 ];
 
@@ -29,17 +29,17 @@ export default function MainNavbar() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
 
-//CHECK USER IS  LOGIN OR NOT IF LOGGED IN SHOW LOGOUT BUT 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+  //CHECK USER IS  LOGIN OR NOT IF LOGGED IN SHOW LOGOUT BUT 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    useEffect (() =>{
-      const token = localStorage.getItem("token");
-      if (token) {
-        setIsLoggedIn(true);
-      } else {
-        setIsLoggedIn (false);
-      }
-    })
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,7 +123,9 @@ export default function MainNavbar() {
               {isLoggedIn ? "Logout" : ""}
             </button>
           </a>
-          <a href="/User-Profile" className="bg-black text-black px-3 py-1.5 hover:bg-gray-200 transition-all duration-200 border-amber-50 rounded-4xl right-2"> <User2 color="white" size={25} /></a>
+          {isLoggedIn ?  (
+            <a href="/User-Profile" className="bg-black text-black px-3 py-1.5 hover:bg-gray-200 transition-all duration-200 border-amber-50 rounded-4xl right-2"> <User2 color="white" size={25} /></a>
+          ) : null}
         </div>
       </div>
 

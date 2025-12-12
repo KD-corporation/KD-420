@@ -38,12 +38,12 @@ export default function AboutUs() {
       role: "Code Warrior",
       level: 92,
       xp: 14210,
-      email: "rohan@example.com",
-      linkedin: "https://linkedin.com/in/rohan",
-      github: "https://github.com/rohan",
-      dockerhub: "https://hub.docker.com/u/rohan",
+      email: "kuldeep8410mtr@gmail.com",
+      linkedin: "https://linkedin.com/in/kuldeep-sharma-b555a21b8",
+      github: "https://github.com/kuldeep8410mtr",
+      dockerhub: "https://hub.docker.com/",
       avatar: "⚔️",
-      specialty: "Full Stack Developer(Chutiyapa",
+      specialty: "Full Stack Developer",
     },
   ];
 

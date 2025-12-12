@@ -36,10 +36,11 @@ export const Features = () => {
     useEffect(() => {
         const userData = JSON.parse(localStorage.getItem("userData") || "{}");
         const email = userData.email || "";
+        const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
         const fetchStats = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/getapis/get-total-solved?email=${email}`, {
+                const response = await fetch(`${BaseUrl}/getapis/get-total-solved?email=${email}`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -90,9 +91,9 @@ export const Features = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-500 to-blue-600">
+        <div className="min-h-screen bg-base-100">
             {/* Top Navigation Bar */}
-            <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+            <nav className="bg-black text-teal-500 border-b border-gray-200 shadow-sm sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         {/* Logo */}
@@ -107,15 +108,15 @@ export const Features = () => {
 
                         {/* Quick Links */}
                         <div className="hidden md:flex items-center gap-6">
-                            <a href="/Game/mazeExplorer" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium transition-colors group">
+                            <a href="/Game/mazeExplorer" className="flex items-center gap-2 text-orange-600 hover:text-orange-600 font-medium transition-colors group">
                                 <Target className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                                 Maze Explorer
                             </a>
-                            <a href="/test" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium transition-colors group">
+                            <a href="/test" className="flex items-center gap-2 text-orange-600 hover:text-orange-600 font-medium transition-colors group">
                                 <Play className="w-4 h-4 group-hover:scale-110 transition-transform" />
                                 Bubble Select
                             </a>
-                            <a href="/Game/arrangeGame" className="flex items-center gap-2 text-gray-600 hover:text-orange-600 font-medium transition-colors group">
+                            <a href="/Game/arrangeGame" className="flex items-center gap-2 text-orange-600 hover:text-orange-600 font-medium transition-colors group">
                                 <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                                 Arrange Query
                             </a>
@@ -141,14 +142,14 @@ export const Features = () => {
                 {/* Stats Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                     {/* Progress Card */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="bg-black rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-600 text-sm font-medium">Problems Solved</span>
+                            <span className="text-white text-sm font-medium">Problems Solved</span>
                             <Trophy className="w-5 h-5 text-orange-500" />
                         </div>
                         <div className="flex items-baseline gap-2">
-                            <span className="text-3xl font-bold text-gray-900">{stats.solved}</span>
-                            <span className="text-gray-500 text-sm">/ {stats.total}</span>
+                            <span className="text-3xl font-bold text-white">{stats.solved}</span>
+                            <span className="text-white text-sm">/ {stats.total}</span>
                         </div>
                         <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
                             <div
@@ -159,14 +160,14 @@ export const Features = () => {
                     </div>
 
                     {/* Easy Card */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="bg-green-900 text-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-600 text-sm font-medium">Easy</span>
+                            <span className="text-gray-100 text-sm font-medium">Easy</span>
                             <span className="text-2xl">🟢</span>
                         </div>
                         <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-bold text-green-600">{stats.Easy}</span>
-                            <span className="text-gray-500 text-sm">/ {stats.totalEasy}</span>
+                            <span className="text-gray-100 text-sm">/ {stats.totalEasy}</span>
                         </div>
                         <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
                             <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(stats.Easy / stats.totalEasy) * 100}%` }} />
@@ -174,48 +175,48 @@ export const Features = () => {
                     </div>
 
                     {/* Medium Card */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="bg-orange-600 rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-600 text-sm font-medium">Medium</span>
+                            <span className="text-black text-sm font-medium">Medium</span>
                             <span className="text-2xl">🟡</span>
                         </div>
                         <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-bold text-yellow-600">{stats.Medium}</span>
-                            <span className="text-gray-500 text-sm">/ {stats.totalMedium}</span>
+                            <span className="text-black text-sm">/ {stats.totalMedium}</span>
                         </div>
                         <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-yellow-500 h-2 rounded-full" style={{ width: `${(stats.Medium / stats.totalMedium) * 100}%` }} />
+                            <div className="bg-yellow-500 text-black h-2 rounded-full" style={{ width: `${(stats.Medium / stats.totalMedium) * 100}%` }} />
                         </div>
                     </div>
 
                     {/* Hard Card */}
-                    <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="bg-red-500 rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-gray-600 text-sm font-medium">Hard</span>
+                            <span className="text-black text-sm font-medium">Hard</span>
                             <span className="text-2xl">🔴</span>
                         </div>
                         <div className="flex items-baseline gap-2">
                             <span className="text-3xl font-bold text-red-600">{stats.Hard}</span>
-                            <span className="text-gray-500 text-sm">/ {stats.totalHard}</span>
+                            <span className="text-black text-sm">/ {stats.totalHard}</span>
                         </div>
                         <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
-                            <div className="bg-red-500 h-2 rounded-full" style={{ width: `${(stats.Hard / stats.totalHard) * 100}%` }} />
+                            <div className="bg-green-500 h-2 rounded-full" style={{ width: `${(stats.Hard / stats.totalHard) * 100}%` }} />
                         </div>
                     </div>
                 </div>
 
                 {/* Problems Section */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-black rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-                        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                    <div className="bg-black px-6 py-4 border-b border-gray-200">
+                        <h2 className="text-xl font-bold text-white flex items-center gap-2">
                             <Filter className="w-5 h-5 text-orange-600" />
                             Problem Set
                         </h2>
                     </div>
 
                     {/* Search & Filter Bar */}
-                    <div className="px-6 py-5 border-b border-gray-200 bg-white">
+                    <div className="px-6 py-5 border-b border-green-200 bg-black">
                         <div className="flex flex-col sm:flex-row gap-4">
                             {/* Search Input */}
                             <div className="flex-1 relative">
@@ -226,7 +227,7 @@ export const Features = () => {
                                     onChange={(e) => setSearchValue(e.target.value)}
                                     type="text"
                                     placeholder="Search problems by title, tags, or description..."
-                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm bg-gray-50 hover:bg-white"
+                                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all text-sm  bg-black text-white"
                                 />
                             </div>
 

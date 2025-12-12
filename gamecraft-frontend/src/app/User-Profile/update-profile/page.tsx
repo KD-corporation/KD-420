@@ -100,6 +100,7 @@ export default function EditProfilePage() {
 
     const stored = localStorage.getItem("userData");
     const email = JSON.parse(stored || "{}").email;
+    const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
     const payload = {
       email,
@@ -113,7 +114,7 @@ export default function EditProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:3001/apis/update-user-profile",
+        `${BaseUrl}/apis/update-user-profile`,
         {
           method: "POST",
           headers: {

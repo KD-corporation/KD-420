@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Database, Plus, Zap, Trophy, Target, Sparkles, Play, ChevronRight, Swords, Shield } from "lucide-react";
 
 import TablesPreviewResponse from "./PreviewOfTables";
+import { env } from "process";
 
 /* ---------------------- INTERFACES ---------------------- */
 
@@ -101,7 +102,8 @@ export default function AddQuestionPage() {
 
   const handleAddQuestion = async () => {
     try {
-      const res = await fetch("http://localhost:3001/api/contribute-question", {
+      const Base_Url = env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+      const res = await fetch(`${Base_Url}/api/contribute-question`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(questionData),
@@ -144,7 +146,8 @@ export default function AddQuestionPage() {
       };
 
       // Send POST request to backend
-      const res = await fetch("http://localhost:3001/api/create-table", {
+      const Base_Url = env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+      const res = await fetch(`${Base_Url}/api/create-table`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -171,7 +174,8 @@ export default function AddQuestionPage() {
     if (!selectedTable.id) return alert("Please select a table");
 
     try {
-      const res = await fetch(`http://172.18.126.70:3001/api/get-tables-preview-all}`);
+      const Base_Url = env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+      const res = await fetch(`${Base_Url}/api/get-tables-preview-all}`);
       const data = await res.json();
       setSelectedTableData([data]);
     } catch (err) {

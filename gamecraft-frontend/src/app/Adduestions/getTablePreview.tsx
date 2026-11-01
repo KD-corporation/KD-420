@@ -14,27 +14,28 @@ export default function CreateTableForm() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const createTable = async (e) => {
+  const createTable = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMsg("");
 
     try {
+      const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
       const response = await axios.post(
-        "http://localhost:8080/create-table",   // your backend endpoint
+        `${BaseUrl}/api/create-table`,
         formData
       );
 
       setMsg(response.data.message || "Table created successfully!");
     } catch (error) {
-      setMsg(error?.response?.data?.message || "Something went wrong!");
+      setMsg(axios.isAxiosError(error) ? (error.response?.data?.message as string) || "Something went wrong!" : "Something went wrong!");
     }
 
     setLoading(false);
@@ -84,7 +85,7 @@ export default function CreateTableForm() {
           <label className="block font-medium text-gray-700">Description</label>
           <textarea
             name="description"
-            rows="2"
+            rows={2}
             className="w-full p-2 border rounded-md"
             placeholder="Short description about table"
             value={formData.description}
@@ -97,7 +98,7 @@ export default function CreateTableForm() {
           <label className="block font-medium text-gray-700">SQL Query</label>
           <textarea
             name="query"
-            rows="5"
+            rows={5}
             className="w-full p-2 border rounded-md font-mono text-sm"
             placeholder="CREATE TABLE example (id INT PRIMARY KEY...);"
             value={formData.query}

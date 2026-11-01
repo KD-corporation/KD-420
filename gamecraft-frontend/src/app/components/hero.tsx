@@ -17,7 +17,7 @@ const MySQLHeroSection: React.FC = () => {
     script.async = true;
     
     script.onload = () => {
-      const gsap = (window as any).gsap;
+      const gsap = (window as unknown as { gsap: typeof import("gsap").gsap }).gsap;
       
       // Hero entrance animation
       gsap.from(titleRef.current, {

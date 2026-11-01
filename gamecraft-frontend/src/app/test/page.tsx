@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { Suspense, useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { Sparkles, Trophy, Target, Zap } from "lucide-react";
 
@@ -10,7 +10,7 @@ interface TablePreviewResponse {
     message: string;
     status: boolean;
     data: {
-        [tableName: string]: Array<{ [column: string]: any }>;
+        [tableName: string]: Array<{ [column: string]: unknown }>;
     };
 }
 
@@ -80,7 +80,7 @@ const TablePreview = ({
     rows,
 }: {
     tableName: string;
-    rows: any[];
+    rows: Record<string, unknown>[];
 }) => (
     <div className="bg-gradient-to-br from-white to-indigo-50 p-4 rounded-xl shadow-lg flex-shrink-0 w-full sm:w-80 border-2 border-indigo-200 hover:border-indigo-400 transition-all duration-300 hover:scale-105">
         <div className="flex items-center gap-2 mb-3">
@@ -145,8 +145,8 @@ const SQLQueryGameTailwind = () => {
     const [loading, setLoading] = useState(false);
     const [score, setScore] = useState(0);
     const [showConfetti, setShowConfetti] = useState(false);
-    const [userQueryResult, setUserQueryResult] = useState<any>(null);
-    const [correctQueryResult, setCorrectQueryResult] = useState<any>(null);
+    const [userQueryResult, setUserQueryResult] = useState<unknown>(null);
+    const [correctQueryResult, setCorrectQueryResult] = useState<unknown>(null);
 
     const [email, setEmail] = useState<string>("");
     const [currentPoints, setCurrentPoints] = useState<number>(0);
@@ -301,14 +301,19 @@ const SQLQueryGameTailwind = () => {
 
                     //<------------ make api call to update that question is solved  ----------- >
                     const updateResponse = await fetch(`${BaseUrl}/api/update-question-solved-status?user_id=${email}&question_id=${questionId}&solved=true`, {
-                        method: 'GEt',
+                        method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
                     });
 
                     const updateData = await updateResponse.json();
+                    const earnedPoints = updateData?.data?.earned_points ?? updateData?.data?.points_earned;
                     if (updateData.status) {
-                        setCurrentPoints(updateData.points_earned);
-                        window.alert("you did and current point is " + updateData.points_earned);
+                        setCurrentPoints(earnedPoints ?? 0);
+                        if (!updateData?.data?.already_solved) {
+                            window.alert(`Correct! You earned points. Total score: ${earnedPoints}`);
+                        } else {
+                            window.alert(`Already solved. Total score: ${earnedPoints}`);
+                        }
                         // console.log("Question solved successfully", updateData);
                     } else {
                         console.error("Failed to update question status:", updateData.message);
@@ -571,14 +576,14 @@ const SQLQueryGameTailwind = () => {
                                     <div>
                                         <TablePreview
                                             tableName="Correct Answer"
-                                            rows={correctQueryResult || []}
+                                            rows={(correctQueryResult as Record<string, unknown>[]) || []}
                                         />
                                     </div>
 
                                     <div>
                                         <TablePreview
                                             tableName="Your Answer"
-                                            rows={userQueryResult || []}
+                                            rows={(userQueryResult as Record<string, unknown>[]) || []}
                                         />
                                     </div>
                                 </div>
@@ -592,4 +597,10 @@ const SQLQueryGameTailwind = () => {
     );
 };
 
-export default SQLQueryGameTailwind;
+export default function TestPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900" />}>
+      <SQLQueryGameTailwind />
+    </Suspense>
+  );
+}

@@ -103,8 +103,8 @@ export default function AboutUs() {
             key={i}
             className="absolute w-2 h-2 bg-purple-500 rounded-full"
             animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              x: [Math.random() * 1000, Math.random() * 1000],
+              y: [Math.random() * 1000, Math.random() * 1000],
             }}
             transition={{
               duration: Math.random() * 10 + 10,
@@ -329,7 +329,7 @@ export default function AboutUs() {
               Ready to Begin Your Adventure?
             </h3>
             <p className="text-lg text-slate-200 mb-8">
-              Join thousands of SQL warriors and start your journey today. No experience needed - we'll turn you into a database master!
+              Join thousands of SQL warriors and start your journey today. No experience needed - we&apos;ll turn you into a database master!
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <button className="px-8 py-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-black rounded-xl font-black text-lg shadow-2xl hover:scale-110 transition-transform flex items-center gap-2">

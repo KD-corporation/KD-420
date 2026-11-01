@@ -1,25 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Sparkles, Play, RotateCcw, Database, Award } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import axios from "axios";
 
 
 interface QuesObject {
-    id: String,
-    title: String,
-    Des: String
+    id: string,
+    title: string,
+    Des: string
 }
 
 interface responseObject {
-    Data?: String,
-    Status: Boolean,
-    message: String,
-    Result: Boolean
+    Data?: string,
+    Status: boolean,
+    message: string,
+    Result: boolean
 }
 
 
-export default function SQLGameLevel01() {
+export default function QuestionPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900" />}>
+      <SQLGameLevel01 />
+    </Suspense>
+  );
+}
+
+function SQLGameLevel01() {
     const [query, setQuery] = useState("");
     const [score, setScore] = useState(0);
     const [level, setLevel] = useState(1);
@@ -60,7 +68,7 @@ export default function SQLGameLevel01() {
         try {
             setLoading(true);
             const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
-            const auth_token = localStorage.getItem("auth_token") || "";
+            const auth_token = localStorage.getItem("token") || localStorage.getItem("auth_token") || "";
             console.log("Submitting query:", query, "tokend", auth_token);
 
 
@@ -96,10 +104,11 @@ export default function SQLGameLevel01() {
             setRes(response.data);
             setLoading(false);
 
-        } catch (err: any) {
+        } catch (err: unknown) {
             setLoading(false);
-            alert("Error " + err.response.data.message || "Unable to submit answer.");
-            setRes(err.response.data);
+            const msg = axios.isAxiosError(err) ? err.response?.data?.message : "Unable to submit answer.";
+            alert(msg || "Unable to submit answer.");
+            if (axios.isAxiosError(err)) setRes(err.response?.data);
             console.error("Error submitting answer:", err);
         }
     }
@@ -169,7 +178,7 @@ export default function SQLGameLevel01() {
                             <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-xl p-4 relative">
                                 <div className="absolute -top-2 left-8 w-4 h-4 bg-white/20 rotate-45" />
                                 <p className="text-white text-sm leading-relaxed">
-                                    "Query wisely, young apprentice! Master the SQL arts to unlock new levels!"
+                                    &quot;Query wisely, young apprentice! Master the SQL arts to unlock new levels!&quot;
                                 </p>
                             </div>
                         </div>

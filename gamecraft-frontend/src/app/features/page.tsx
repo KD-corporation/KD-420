@@ -11,7 +11,7 @@ interface LevelOption {
     icon: string;
 }
 
-export const Features = () => {
+const Features = () => {
     const levelOptions: LevelOption[] = [
         { value: "Easy", label: "Easy", color: "text-green-500", icon: "🟢" },
         { value: "Medium", label: "Medium", color: "text-yellow-500", icon: "🟡" },
@@ -255,7 +255,7 @@ export const Features = () => {
                                 <span className="text-sm text-gray-600 font-medium">Active filters:</span>
                                 {debouncedValue && (
                                     <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium flex items-center gap-2">
-                                        Search: "{debouncedValue}"
+                                        Search: &quot;{debouncedValue}&quot;
                                         <button
                                             onClick={() => setSearchValue("")}
                                             className="hover:bg-orange-200 rounded-full p-0.5 transition-colors"
@@ -294,10 +294,8 @@ export const Features = () => {
                     {/* Question List */}
                     <div className="p-6">
                         <SqlQuestions
-                            {...({
-                                search: debouncedValue,
-                                level: selectedLevel
-                            } as unknown as any)}
+                            search={debouncedValue}
+                            level={selectedLevel}
                         />
                     </div>
                 </div>

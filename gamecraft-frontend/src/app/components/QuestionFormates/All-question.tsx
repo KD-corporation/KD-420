@@ -24,7 +24,7 @@ interface ApiResponse {
   data: Question[];
 }
 
-export default function SqlQuestions({ search = "", level = "" }) {
+export default function SqlQuestions({ search = "", level = "" }: { search?: string; level?: string }) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [openId, setOpenId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

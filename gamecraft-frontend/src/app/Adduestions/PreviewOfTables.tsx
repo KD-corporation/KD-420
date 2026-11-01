@@ -5,11 +5,11 @@ import React, { useEffect, useState } from "react";
 interface TablesPreviewResponse {
   message: string;
   status: boolean;
-  data: Record<string, any[]>;
+  data: Record<string, unknown[]>;
 }
 
 export default function TablesPreview() {
-  const [tables, setTables] = useState<Record<string, any[]> | null>(null);
+  const [tables, setTables] = useState<Record<string, unknown[]> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,7 +56,7 @@ export default function TablesPreview() {
                   <table className="min-w-full border border-slate-700">
                     <thead>
                       <tr className="bg-slate-700">
-                        {Object.keys(tables[table][0]).map((col) => (
+                        {Object.keys(tables[table][0] as Record<string, unknown>).map((col) => (
                           <th key={col} className="px-4 py-2 border border-slate-600 text-left capitalize">
                             {col}
                           </th>
@@ -66,7 +66,7 @@ export default function TablesPreview() {
                     <tbody>
                       {tables[table].map((row, idx) => (
                         <tr key={idx} className="even:bg-slate-800 odd:bg-slate-900">
-                          {Object.values(row).map((val, i) => (
+                          {Object.values(row as Record<string, unknown>).map((val, i) => (
                             <td key={i} className="px-4 py-2 border border-slate-700 text-sm">
                               {String(val)}
                             </td>

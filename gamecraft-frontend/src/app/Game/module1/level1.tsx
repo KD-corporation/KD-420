@@ -1,13 +1,72 @@
 "use client";
 import { useState } from "react";
-import { Sparkles, Play, RotateCcw, Database, Award } from "lucide-react";
+import { Sparkles, Play, RotateCcw, Database, Award, ChevronRight, AlertTriangle } from "lucide-react";
 import SQLGameUI2 from "./level2";
+
+type Feedback = { kind: "success" | "error" | "partial"; message: string } | null;
+
+const LEVEL_1 = {
+  question: "Write a query to return only students who scored more than 80.",
+  hint: "Hint: SELECT * FROM students WHERE score > 80",
+  expectedKeywords: ["SELECT", "FROM", "WHERE", "80"],
+  acceptedAnswers: [
+    "select * from students where score > 80;",
+    "select * from students where score > 80",
+    "select name, score from students where score > 80;",
+    "select name, score from students where score > 80",
+    "select * from students where score>80;",
+    "select * from students where score>80",
+  ],
+};
 
 export default function SQLGameLevel01() {
   const [query, setQuery] = useState("");
   const [score, setScore] = useState(0);
   const [level, setLevel] = useState(1);
+  const [feedback, setFeedback] = useState<Feedback>(null);
+  const [showHint, setShowHint] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
 
+  const evaluateQuery = () => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setFeedback({ kind: "error", message: "Write a SQL spell first, apprentice!" });
+      return;
+    }
+
+    const lower = trimmed.toLowerCase().replace(/\s+/g, " ");
+    const isAccepted = LEVEL_1.acceptedAnswers.includes(lower);
+    const upper = trimmed.toUpperCase();
+    const missing = LEVEL_1.expectedKeywords.filter((k) => !upper.includes(k));
+
+    if (isAccepted) {
+      setScore((prev) => prev + 100);
+      setFeedback({
+        kind: "success",
+        message: "Excellent! Your query is correct — +100 points!",
+      });
+      setLevel(2);
+      setUnlocked(true);
+    } else if (missing.length <= 1) {
+      setFeedback({
+        kind: "partial",
+        message: `Almost there! Recheck the condition on score (you need ${missing.join(", ") || "a small tweak"}).`,
+      });
+      setShowHint(true);
+    } else {
+      setFeedback({
+        kind: "partial",
+        message: "Not quite yet — look at the mission brief and try again.",
+      });
+      setShowHint(true);
+    }
+  };
+
+  const resetLevel = () => {
+    setQuery("");
+    setFeedback(null);
+    setShowHint(false);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-6 flex justify-center items-center">
@@ -46,7 +105,7 @@ export default function SQLGameLevel01() {
                     <div className="absolute top-[50px] left-1/2 -translate-x-1/2 w-24 h-6 bg-indigo-600 rounded-full" />
                     <Sparkles className="absolute top-8 left-1/2 -translate-x-1/2 w-6 h-6 text-yellow-300 animate-pulse" />
                   </div>
-                  
+
                   {/* Wizard Face */}
                   <div className="relative z-10 mt-8">
                     <div className="w-32 h-32 bg-gradient-to-br from-amber-200 to-amber-300 rounded-full">
@@ -74,7 +133,11 @@ export default function SQLGameLevel01() {
               <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-xl p-4 relative">
                 <div className="absolute -top-2 left-8 w-4 h-4 bg-white/20 rotate-45" />
                 <p className="text-white text-sm leading-relaxed">
-                  "Query wisely, young apprentice! Master the SQL arts to unlock new levels!"
+                  {feedback?.kind === "success"
+                    ? "Magnificent! You have mastered the WHERE clause. Level 2 awaits!"
+                    : feedback?.kind === "partial"
+                      ? "Close, young one! Read my hint carefully and try again."
+                      : "\"Query wisely, young apprentice! Master the SQL arts to unlock new levels!\""}
                 </p>
               </div>
             </div>
@@ -88,9 +151,13 @@ export default function SQLGameLevel01() {
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                 <p className="font-semibold text-cyan-300 text-sm uppercase tracking-wide">Mission Brief</p>
               </div>
-              <p className="text-white text-lg">
-                Write a query to return only students who scored more than 80.
-              </p>
+              <p className="text-white text-lg">{LEVEL_1.question}</p>
+              {showHint && (
+                <p className="text-yellow-300/90 text-sm mt-2 flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  {LEVEL_1.hint}
+                </p>
+              )}
             </div>
 
             {/* Code Editor */}
@@ -103,17 +170,24 @@ export default function SQLGameLevel01() {
                 placeholder="SELECT * FROM..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) evaluateQuery();
+                }}
               />
             </div>
 
             {/* Buttons */}
             <div className="flex gap-3">
-              <button className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 transform hover:scale-105">
+              <button
+                onClick={evaluateQuery}
+                disabled={unlocked}
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
                 <Play className="w-5 h-5" />
-                Cast Query
+                {unlocked ? "Level Complete" : "Cast Query"}
               </button>
               <button
-                onClick={() => setQuery("")}
+                onClick={resetLevel}
                 className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-xl shadow-lg transition-all duration-200 font-semibold flex items-center justify-center gap-2"
               >
                 <RotateCcw className="w-5 h-5" />
@@ -121,13 +195,20 @@ export default function SQLGameLevel01() {
               </button>
             </div>
 
-            {/* Feedback Placeholder */}
-            <div className="h-8 flex items-center">
-              {/* Example state messages - uncomment to test */}
-              {/* <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
-                <Sparkles className="w-4 h-4" />
-                Excellent! Your query is correct!
-              </div> */}
+            {/* Feedback */}
+            <div className="min-h-8 flex items-center">
+              {feedback?.kind === "success" && (
+                <div className="bg-green-500/20 border border-green-500/50 text-green-300 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  {feedback.message}
+                </div>
+              )}
+              {feedback && feedback.kind !== "success" && (
+                <div className="bg-amber-500/20 border border-amber-500/50 text-amber-300 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  {feedback.message}
+                </div>
+              )}
             </div>
 
             {/* Output Table */}
@@ -136,14 +217,29 @@ export default function SQLGameLevel01() {
               <div className="bg-gray-900/30 rounded-xl p-8 text-center">
                 <Database className="w-12 h-12 text-gray-500 mx-auto mb-3 opacity-50" />
                 <div className="text-gray-400 text-sm">
-                  Your results will materialize here...
+                  {feedback?.kind === "success"
+                    ? "Your results are correct! Cast another spell or continue below..."
+                    : "Your results will materialize here..."}
                 </div>
               </div>
             </div>
+
+            {/* Next Level */}
+            {unlocked && (
+              <a
+                href="/Game/module1"
+                className="block bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-gray-900 px-6 py-3 rounded-xl shadow-lg transition-all duration-200 font-bold flex items-center justify-center gap-2 transform hover:scale-105"
+              >
+                Continue to Level 2
+                <ChevronRight className="w-5 h-5" />
+              </a>
+            )}
           </div>
         </div>
       </div>
-      <SQLGameUI2 />
+
+      {/* Level 2 is only rendered after Level 1 is solved */}
+      {unlocked && <SQLGameUI2 />}
     </div>
   );
 }

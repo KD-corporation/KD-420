@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState, } from "react";
+import React, { Suspense, useEffect, useMemo, useState, } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   Sparkles,
@@ -34,15 +34,10 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 type SentenceConfig = {
-  id: number;
-  text: string;
-  hint?: string;
+  id: number;
+  text: string;
+  hint?: string;
 };
-
-interface Props {
-  sentences?: SentenceConfig[];
-  showAnswers?: boolean;
-}
 
 // --------------------------
 // SORTABLE ITEM COMPONENT
@@ -114,10 +109,17 @@ const DEFAULT_SENTENCES: QuesObject[] = [
     },
 ];
 
-export default function SentenceArrangeGame({
-  sentences = DEFAULT_SENTENCES,
-  showAnswers = false,
-}: Props) {
+export default function ArrangeGamePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-900" />}>
+      <SentenceArrangeGame />
+    </Suspense>
+  );
+}
+
+function SentenceArrangeGame() {
+  const sentences = DEFAULT_SENTENCES;
+  const showAnswers = false;
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 

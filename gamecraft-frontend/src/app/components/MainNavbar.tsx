@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -34,12 +35,17 @@ export default function MainNavbar() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  })
+    setIsLoggedIn(Boolean(token));
+  }, []);
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    localStorage.removeItem("token");
+    localStorage.removeItem("userData");
+    setIsLoggedIn(false);
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -86,7 +92,7 @@ export default function MainNavbar() {
   const NavbarContent = () => (
     <nav className="w-full flex flex-row items-center justify-between">
       {/* Logo */}
-      <a href="/">
+      <Link href="/">
         <div className="flex items-center space-x-2">
           <img
             src={SqlLogO.src}
@@ -95,7 +101,7 @@ export default function MainNavbar() {
           />
           <span className="text-xl font-bold tracking-wide">SQL Gaming</span>
         </div>
-      </a>
+      </Link>
 
       {/* Desktop Navbar Items */}
       <div className="hidden md:flex space-x-8 text-base font-medium">
@@ -113,20 +119,29 @@ export default function MainNavbar() {
 
       {/* Right Side (Desktop) */}
       <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-        <div className="hidden md:flex items-center gap-4 text-sm font-medium">
-          <a href="/auth/login" className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-            {isLoggedIn ? "" : "Login/SignUp"}
-            <button onClick={() => {
-              localStorage.removeItem("token");
-              setIsLoggedIn(false);
-            }}>
-              {isLoggedIn ? "Logout" : ""}
-            </button>
+        {!isLoggedIn ? (
+          <a
+            href="/auth/login"
+            className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200"
+          >
+            Login/SignUp
           </a>
-          {isLoggedIn ?  (
-            <a href="/User-Profile" className="bg-black text-black px-3 py-1.5 hover:bg-gray-200 transition-all duration-200 border-amber-50 rounded-4xl right-2"> <User2 color="white" size={25} /></a>
-          ) : null}
-        </div>
+        ) : (
+          <>
+            <button
+              onClick={handleLogout}
+              className="bg-white/10 border border-white/20 text-white px-3 py-1.5 rounded-lg hover:bg-white/20 transition-all duration-200"
+            >
+              Logout
+            </button>
+            <a
+              href="/User-Profile"
+              className="bg-black px-3 py-1.5 hover:bg-gray-800 transition-all duration-200 border border-white/10 rounded-full right-2"
+            >
+              <User2 color="white" size={25} />
+            </a>
+          </>
+        )}
       </div>
 
       {/* Hamburger (Mobile) */}
@@ -188,13 +203,44 @@ export default function MainNavbar() {
         </div>
 
         <div className="mt-auto px-6 py-6 border-t border-gray-700 flex flex-col gap-3">
-          <button onClick={() => setIsLoginOpen(true)} className="hover:text-gray-300 transition-all duration-200">
-            Login
-          </button>
-          <button onClick={() => setIsSignupOpen(true)} className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200">
-            Sign Up
-          </button>
-
+          {!isLoggedIn ? (
+            <>
+              <button
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  setIsLoginOpen(true);
+                }}
+                className="hover:text-gray-300 transition-all duration-200"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  setIsDrawerOpen(false);
+                  setIsSignupOpen(true);
+                }}
+                className="bg-white text-black px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-all duration-200"
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <a
+                href="/User-Profile"
+                className="hover:text-gray-300 transition-all duration-200"
+                onClick={() => setIsDrawerOpen(false)}
+              >
+                My Profile
+              </a>
+              <button
+                onClick={handleLogout}
+                className="bg-white/10 border border-white/20 text-white px-3 py-1.5 rounded-lg hover:bg-white/20 transition-all duration-200"
+              >
+                Logout
+              </button>
+            </>
+          )}
         </div>
       </div>
 

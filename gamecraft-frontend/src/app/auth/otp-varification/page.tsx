@@ -275,7 +275,7 @@ const OtpVerificationPage = () => {
                     </div>
 
                     <h1 className="title">Verify Your Email</h1>
-                    <p className="subtitle">We've sent a 6-digit code to</p>
+                    <p className="subtitle">We&apos;ve sent a 6-digit code to</p>
                     <p className="email-display">{email || 'your email'}</p>
 
                     <form className="form" onSubmit={handleSubmit}>
@@ -305,7 +305,7 @@ const OtpVerificationPage = () => {
                     </form>
 
                     <p className="resend-text">
-                        Didn't receive the code?{' '}
+                        Didn&apos;t receive the code?{' '}
                         <a className="resend-link">Resend Code</a>
                     </p>
                 </div>

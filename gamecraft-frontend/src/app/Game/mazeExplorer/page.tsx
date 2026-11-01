@@ -13,19 +13,11 @@ type Cell = {
   isExit?: boolean;
 };
 
-interface Props {
-  answer?: string;
-  question?: string; // New prop for the hint/question
-  rows?: number;
-  cols?: number;
-}
-
-export default function SqlMazeExplorer({
-  answer = "SELECT * FROM orders WHERE customerid = 1;",
-  question = "Fetch all columns from the 'orders' table where the customer ID is 1.", // Default Question
-  rows = 11,
-  cols = 17,
-}: Props) {
+export default function SqlMazeExplorer() {
+  const answer = "SELECT * FROM orders WHERE customerid = 1;";
+  const question = "Fetch all columns from the 'orders' table where the customer ID is 1.";
+  let rows = 11;
+  let cols = 17;
   if (rows % 2 === 0) rows += 1;
   if (cols % 2 === 0) cols += 1;
 

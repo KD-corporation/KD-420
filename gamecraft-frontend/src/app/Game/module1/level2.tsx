@@ -185,7 +185,7 @@ export default function SQLGameLevel02() {
                   "bg-white/20"
                 }`} />
                 <p className="text-white text-sm leading-relaxed">
-                  "{wizardMessage}"
+                  &quot;{wizardMessage}&quot;
                 </p>
               </div>
             </div>

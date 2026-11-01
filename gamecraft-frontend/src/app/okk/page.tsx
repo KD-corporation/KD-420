@@ -1,27 +1,29 @@
 "use client";
 
-import { env } from "process";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 interface ActivityDay {
   date: string;
   count: number;
 }
 
-export default function UserActivityPage({ params }: { params: { email: string } }) {
+function UserActivityContent() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get("email") || "gk022135@gmail.com";
   const [data, setData] = useState<ActivityDay[]>([]);
- const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const BaseUrl = process.env.NEXT_PUBLIC_API_URL;
 
   useEffect(() => {
-    fetch(`${BaseUrl}/getapis/getuser-activity?email=gk022135@gmail.com`)
-      .then(res => res.json())
+    fetch(`${BaseUrl}/getapis/getuser-activity?email=${email}`)
+      .then((res) => res.json())
       .then(setData);
-  }, [params.email]);
+  }, [email, BaseUrl]);
 
   return (
     <div className="p-6">
       <h1 className="text-xl font-semibold mb-4">
-        Activity Heatmap for {params.email}
+        Activity Heatmap for {email}
       </h1>
 
       <CalendarHeatmap data={data} />
@@ -29,6 +31,13 @@ export default function UserActivityPage({ params }: { params: { email: string }
   );
 }
 
+export default function UserActivityPage() {
+  return (
+    <Suspense fallback={<div className="p-6">Loading...</div>}>
+      <UserActivityContent />
+    </Suspense>
+  );
+}
 
 // ---------------- COMPONENT -------------------
 
@@ -37,7 +46,6 @@ function CalendarHeatmap({ data }: { data: ActivityDay[] }) {
   const daysBack = 365;
   const days: { date: string; count: number }[] = [];
 
-  // Create last 365 days
   for (let i = 0; i < daysBack; i++) {
     const d = new Date();
     d.setDate(today.getDate() - i);
@@ -52,7 +60,7 @@ function CalendarHeatmap({ data }: { data: ActivityDay[] }) {
   }
 
   return (
-    <div className="grid grid-cols-53 gap-1">
+    <div className="flex flex-wrap gap-1">
       {days.reverse().map((day) => (
         <div
           key={day.date}

@@ -39,10 +39,23 @@ type SentenceConfig = {
   hint?: string;
 };
 
-interface Props {
-  sentences?: SentenceConfig[];
-  showAnswers?: boolean; 
-}
+const DEFAULT_SENTENCES: SentenceConfig[] = [
+  {
+    id: 1,
+    text: "SELECT * FROM orders WHERE customerid = 1;",
+    hint: "Basic SELECT query filtering by customerid",
+  },
+  {
+    id: 2,
+    text: "SELECT name , price FROM products ORDER BY price DESC;",
+    hint: "Sorting products from highest price to lowest",
+  },
+  {
+    id: 3,
+    text: "INSERT INTO customers ( name , email ) VALUES ( 'John' , 'john@example.com' );",
+    hint: "Insert a new customer",
+  },
+];
 
 // --------------------------
 // SORTABLE ITEM COMPONENT
@@ -87,26 +100,9 @@ const SortableToken = ({ token, id }: { token: string; id: string }) => {
 // MAIN COMPONENT
 // --------------------------
 
-export default function SentenceArrangeGame({
-  sentences = [
-    {
-      id: 1,
-      text: "SELECT * FROM orders WHERE customerid = 1;",
-      hint: "Basic SELECT query filtering by customerid",
-    },
-    {
-      id: 2,
-      text: "SELECT name , price FROM products ORDER BY price DESC;",
-      hint: "Sorting products from highest price to lowest",
-    },
-    {
-      id: 3,
-      text: "INSERT INTO customers ( name , email ) VALUES ( 'John' , 'john@example.com' );",
-      hint: "Insert a new customer",
-    },
-  ],
-  showAnswers = false,
-}: Props) {
+export default function SentenceArrangeGame() {
+  const sentences = DEFAULT_SENTENCES;
+  const showAnswers = false;
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   

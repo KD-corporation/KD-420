@@ -6,21 +6,6 @@ import { Github, InstagramIcon, Twitter } from "lucide-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-interface userData {
-  name?: string;
-  email: string;
-  role?: string;
-  image?: string;
-  location?: string;
-  token? : string;
-}
-
-interface response {
-  status: boolean;
-  user?: userData;
-  message?: string;
-}
-
 export default function LoginSignupSlider() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isPasswordMtch, setPasswordMtch] = useState(false);
@@ -70,19 +55,16 @@ export default function LoginSignupSlider() {
         }
       );
 
-      // Handle API response
-      if (!response.status) {
-        console.error("Signup failed:", response.data.message);
+      if (!response.data?.status) {
+        alert(response.data?.message || "Signup failed. Please try again.");
         return;
       }
-      console.log("Signup response data:", response);
-
-      console.log("Signup successful:", response.data);
 
       // Redirect to verification page
       router.push(`/auth/otp-varification?email=${signupFormData.email}`);
-    } catch (error: any) {
-      console.error("Signup error:", error.response?.data || error.message);
+    } catch (error) {
+      alert(axios.isAxiosError(error) ? (error.response?.data?.message as string) || "Signup failed. Please try again." : "Signup failed. Please try again.");
+      console.error("Signup error:", axios.isAxiosError(error) ? error.response?.data || error.message : error);
     } finally {
       setLoading(false); // Always stop loading, even on error
     }
@@ -93,36 +75,36 @@ export default function LoginSignupSlider() {
     e.preventDefault();
     setLoading(true);
 
-    //api call can be made here
-    const response: response = await axios(`${BaseUrl}/api/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: JSON.stringify({
-        Id: loginFormData.email,
-        password: loginFormData.password,
-      }),
-    })
-    if (!response.status) {
-      //handle error
-      setLoading(false);
-      return;
-    }
-    setLoading(false);
-    //store the user data in local storage
-    const resPayload = (response as any).data;
-    if (resPayload?.status && resPayload?.data) {
-      localStorage.setItem("token", resPayload.data.token ?? "");
-      localStorage.setItem("userData", JSON.stringify(resPayload.data.user ?? {}));
-    } else {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userData");
-    }
+    try {
+      const response = await axios.post(
+        `${BaseUrl}/api/auth/login`,
+        {
+          Id: loginFormData.email,
+          password: loginFormData.password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    router.push('/User-Profile');
-    // Add your login logic here
-    console.log("Login form data:", loginFormData);
+      const payload = response.data;
+      if (payload?.status && payload?.data) {
+        localStorage.setItem("token", payload.data.token ?? "");
+        localStorage.setItem("userData", JSON.stringify(payload.data.user ?? {}));
+        router.push("/User-Profile");
+      } else {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userData");
+        alert(payload?.message || "Invalid credentials");
+      }
+    } catch (error) {
+      alert(axios.isAxiosError(error) ? (error.response?.data?.message as string) || "Login failed. Please try again." : "Login failed. Please try again.");
+      console.error("Login error:", axios.isAxiosError(error) ? error.response?.data || error.message : error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const socialButtonClasses =
@@ -136,7 +118,7 @@ export default function LoginSignupSlider() {
           className={`absolute top-0 left-0 w-1/2 h-full flex items-center justify-center transition-all duration-700 ease-in-out ${isSignUp ? "translate-x-full opacity-100 z-20" : "opacity-0 z-10"
             }`}
         >
-          <form className="w-full px-12 space-y-4">
+          <form onSubmit={handleSignup} className="w-full px-12 space-y-4">
             <h1 className="text-3xl font-bold text-red-600 text-center">
               Create Account
             </h1>
@@ -236,7 +218,7 @@ export default function LoginSignupSlider() {
           className={`absolute top-0 left-0 w-1/2 h-full flex items-center justify-center transition-all duration-700 ease-in-out ${isSignUp ? "opacity-0 z-10" : "opacity-100 z-20"
             }`}
         >
-          <form className="w-full px-12 space-y-4">
+          <form onSubmit={handleLogin} className="w-full px-12 space-y-4">
             <h1 className="text-3xl font-bold text-red-600 text-center">
               Sign In
             </h1>
@@ -286,11 +268,11 @@ export default function LoginSignupSlider() {
             </a>
 
             <button
-              onClick={handleLogin}
-
-              className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold uppercase tracking-wider hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg"
+              type="submit"
+              disabled={loading}
+              className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold uppercase tracking-wider hover:bg-red-700 transition-transform transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
         </div>

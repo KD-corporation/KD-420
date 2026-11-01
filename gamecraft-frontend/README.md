@@ -1,39 +1,123 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GameCraft — Frontend
 
-## Getting Started
+Next.js web client for **Game Craft**, an interactive game for learning SQL through play.
 
-First, run the development server:
+- **Framework:** Next.js 15 (App Router) + React 19
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS 4
+- **Animation:** GSAP, Framer Motion
+- **HTTP:** Axios
+- **Port:** `3000`
+
+---
+
+## Prerequisites
+
+| Tool     | Notes                                            |
+| -------- | ------------------------------------------------ |
+| Node 20+ | https://nodejs.org (tested on Node 24)           |
+| Make     | Optional — all steps can be run with npm too     |
+
+The **backend must be running** (default `http://localhost:3001`) — see the
+`GameCraft-backend` README.
+
+---
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd gamecraft-frontend
+make setup   # create .env.local + npm install
+make dev     # start dev server on http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 and log in with the seeded backend account:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Field    | Value                                    |
+| -------- | ---------------------------------------- |
+| Email    | `demo@gamecraft.dev` (or username `demo`) |
+| Password | `password123`                            |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## What `make setup` does
 
-To learn more about Next.js, take a look at the following resources:
+1. **`env`** — copies `.env.example` → `.env.local` (if missing).
+2. **`install`** — runs `npm install`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run `make help` to see every target.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Manual setup (without Make)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cp .env.example .env.local   # if .env.local doesn't exist
+npm install
+npm run dev                  # http://localhost:3000
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Other scripts:
 
+```bash
+npm run build   # production build
+npm run start   # serve an existing build
+npm run lint    # ESLint
+```
 
-kd id working ???
+---
+
+## Configuration (`.env.local`)
+
+| Variable                    | Default                 | Purpose                              |
+| --------------------------- | ----------------------- | ------------------------------------ |
+| `NEXT_PUBLIC_API_URL`       | `http://localhost:3001` | Backend base URL (most pages)        |
+| `NEXT_PUBLIC_API_BASE_URL`  | `http://localhost:3001` | Backend base URL (Adduestions page)  |
+
+Both names are set because different pages read different variables. Point them
+at your backend if it isn't on `localhost:3001`.
+
+> `NEXT_PUBLIC_*` values are inlined at **build time** — restart `npm run dev`
+> (or rebuild) after changing them.
+
+---
+
+## Project structure
+
+```
+gamecraft-frontend/
+├── src/app/                 # App Router pages
+│   ├── page.tsx             # landing page
+│   ├── auth/                # login, signup, OTP verification
+│   ├── question/            # question list/detail
+│   ├── Game/                # game modules (maze, arrange, scenario…)
+│   ├── Adduestions/         # contribute tables/questions
+│   ├── User-Profile/        # profile + update
+│   ├── features/, about/    # static pages
+│   └── components/          # shared UI (navbar, modals, forms)
+├── public/                  # static assets
+├── Makefile                 # setup / dev helpers
+├── .env.example             # copy to .env.local
+└── next.config.ts
+```
+
+---
+
+## Troubleshooting
+
+**`ECONNREFUSED localhost:3001` / API calls fail**
+The backend isn't running — start it (`make run` in `GameCraft-backend`) or
+point `NEXT_PUBLIC_API_URL` at the right address.
+
+**Env changes don't take effect**
+`NEXT_PUBLIC_*` vars are baked in at build time — restart the dev server.
+
+**Port 3000 already in use**
+```bash
+lsof -ti:3000 | xargs kill -9
+```
+
+**Dependencies out of sync**
+```bash
+rm -rf node_modules package-lock.json && npm install
+```
